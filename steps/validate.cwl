@@ -36,7 +36,8 @@ requirements:
                     # Check for required columns
                     if not required_columns.issubset(columns):
                         missing_columns = required_columns - columns
-                        invalid_reasons.append(f"Missing required columns: {', '.join(missing_columns)}")
+                        found_columns = ', '.join(columns)  # List of found columns
+                        invalid_reasons.append(f"Missing required columns: {', '.join(missing_columns)}. Found columns: {found_columns}")
                         prediction_file_status = "INVALID"
                     else:
                         # Check if 'predictedAge' contains only numbers
@@ -60,6 +61,7 @@ requirements:
 
         with open(args.results, 'w') as o:
             o.write(json.dumps(result))
+
 
 inputs:
   - id: input_file
