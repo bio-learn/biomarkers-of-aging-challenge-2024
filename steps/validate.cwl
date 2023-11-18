@@ -30,6 +30,8 @@ requirements:
             try:
                 with open(args.submission_file, newline='') as csvfile:
                     reader = csv.DictReader(csvfile)
+                    # Strip spaces from column names
+                    reader.fieldnames = [name.strip() for name in reader.fieldnames]
                     required_columns = {'sampleId', 'predictedAge'}
                     columns = set(reader.fieldnames)
 
