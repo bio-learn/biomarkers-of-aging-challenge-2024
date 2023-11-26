@@ -15,43 +15,52 @@ requirements:
         import json
         import csv
 
-        def read_csv(filename):
-            """ Read a CSV file and return a dictionary mapping from the first column to the second column. """
-            data = {}
-            with open(filename, newline='') as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    data[row['sampleId'].strip()] = float(row[next(iter(row.keys() - {'sampleId'}))].strip())
-            return data
-
-        def calculate_mean_average_error(submission, goldstandard):
-            """ Calculate the mean average error between submission and goldstandard. """
-            errors = []
-            for sample_id, predicted_age in submission.items():
-                if sample_id in goldstandard:
-                    error = abs(predicted_age - goldstandard[sample_id])
-                    errors.append(error)
-            return sum(errors) / len(errors) if errors else None
-
         parser = argparse.ArgumentParser()
-        parser.add_argument("-f", "--submissionfile", required=True, help="Submission File")
-        parser.add_argument("-r", "--results", required=True, help="Scoring results")
-        parser.add_argument("-g", "--goldstandard", required=True, help="Goldstandard for scoring")
+        parser.add_argument("-r", "--results", required=True, help="Validation results")
+        parser.add_argument("-e", "--entity_type", required=True, help="Synapse entity type downloaded")
+        parser.add_argument("-s", "--submission_file", help="Submission File")
 
         args = parser.parse_args()
 
-        # Read submission file and gold standard file
-        submission_data = read_csv(args.submissionfile)
-        goldstandard_data = read_csv(args.goldstandard)
+        if args.submission_file is None:
+            prediction_file_status = "INVALID"
+            invalid_reasons = ['Expected FileEntity type but found ' + args.entity_type]
+        else:
+            invalid_reasons = []
+            try:
+                with open(args.submission_file, newline='') as csvfile:
+                    reader = csv.DictReader(csvfile)
+                    # Strip spaces from column names
+                    reader.fieldnames = [name.strip() for name in reader.fieldnames]
+                    required_columns = {'sampleId', 'predictedAge'}
+                    columns = set(reader.fieldnames)
 
-        # Calculate mean average error
-        mae = calculate_mean_average_error(submission_data, goldstandard_data)
+                    # Check for required columns
+                    if not required_columns.issubset(columns):
+                        missing_columns = required_columns - columns
+                        found_columns = ', '.join(columns)  # List of found columns
+                        invalid_reasons.append(f"Missing required columns: {', '.join(missing_columns)}. Found columns: {found_columns}")
+                        prediction_file_status = "INVALID"
+                    else:
+                        # Check if 'predictedAge' contains only numbers
+                        for row in reader:
+                            try:
+                                float(row['predictedAge'])  # Attempt to convert to float
+                            except ValueError:
+                                invalid_reasons.append("'predictedAge' column must contain only numbers")
+                                prediction_file_status = "INVALID"
+                                break
 
-        # Prepare result
-        prediction_file_status = "SCORED" if mae is not None else "ERROR"
-        result = {'mae': mae, 'submission_status': prediction_file_status}
+                        if not invalid_reasons:
+                            prediction_file_status = "VALIDATED"
+            except Exception as e:
+                # Handle file reading and parsing errors
+                invalid_reasons.append(str(e))
+                prediction_file_status = "INVALID"
 
-        # Write result
+        result = {'submission_errors': "\n".join(invalid_reasons),
+                  'submission_status': prediction_file_status}
+
         with open(args.results, 'w') as o:
             o.write(json.dumps(result))
 
