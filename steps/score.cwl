@@ -92,4 +92,4 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: python:3.9.1-slim-buster
+    dockerPull: python:3.10.14-bullseye
