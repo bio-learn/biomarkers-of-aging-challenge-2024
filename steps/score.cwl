@@ -91,4 +91,4 @@ arguments:
 
 hints:
   DockerRequirement:
-    dockerPull: python:3.10.14-bullseye
+    dockerPull: boac-eval:latest
