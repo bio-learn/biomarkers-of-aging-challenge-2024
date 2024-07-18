@@ -24,7 +24,6 @@ requirements:
 
         # Install required packages
         install("biolearn==0.4.4")
-        install("pandas")
 
         import pandas as pd
         from biolearn.data_library import GeoData
