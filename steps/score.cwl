@@ -11,27 +11,11 @@ requirements:
     - entryname: score.py
       entry: |
         #!/usr/bin/env python
+        import pandas as pd
+        from biolearn.data_library import GeoData
+        from biolearn.mortality import calculate_mortality_hazard_ratios
         import argparse
         import json
-        import csv
-
-        def read_csv(filename):
-            """ Read a CSV file and return a dictionary mapping from the first column to the second column. """
-            data = {}
-            with open(filename, newline='') as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    data[row['sampleId'].strip()] = float(row[next(iter(row.keys() - {'sampleId'}))].strip())
-            return data
-
-        def calculate_mean_average_error(submission, goldstandard):
-            """ Calculate the mean average error between submission and goldstandard. """
-            errors = []
-            for sample_id, predicted_age in submission.items():
-                if sample_id in goldstandard:
-                    error = abs(predicted_age - goldstandard[sample_id])
-                    errors.append(error)
-            return sum(errors) / len(errors) if errors else None
 
         parser = argparse.ArgumentParser()
         parser.add_argument("-f", "--submissionfile", required=True, help="Submission File")
@@ -40,21 +24,26 @@ requirements:
 
         args = parser.parse_args()
 
-        # Read submission file and gold standard file
-        submission_data = read_csv(args.submissionfile)
-        goldstandard_data = read_csv(args.goldstandard)
+        try:
+            # Calculate Score
+            gold_standard = GeoData(pd.read_csv(args.goldstandard, index_col=0), None, None)
+            submitted_predictions = pd.read_csv(args.submissionfile, index_col=0)
+            hazard_ratios = calculate_mortality_hazard_ratios(gold_standard, submitted_predictions)
 
-        # Calculate mean average error
-        mae = calculate_mean_average_error(submission_data, goldstandard_data)
+            # Extract data
+            hr_value = hazard_ratios.iloc[0]['HR']
+            pval_value = hazard_ratios.iloc[0]['P_value']
+            result = {'hr': hr_value, 'pval': pval_value, 'submission_status': "SCORED"}
 
-        # Prepare result
-        prediction_file_status = "SCORED" if mae is not None else "ERROR"
-        result = {'mae': mae, 'submission_status': prediction_file_status}
+        except Exception as e:
+            result = {'submission_status': "ERROR"}
+            print(f"An error occurred: {e}")
 
-        # Write result
+        # Write result to JSON file
         with open(args.results, 'w') as o:
             o.write(json.dumps(result))
 
+        print(f"Results saved to {args.results}")
 
 inputs:
   - id: input_file
@@ -89,3 +78,7 @@ arguments:
 hints:
   DockerRequirement:
     dockerPull: python:3.9.1-slim-buster
+    dockerImageId: biolearn-installed
+    dockerFile: |
+      FROM python:3.9.1-slim-buster
+      RUN pip install biolearn==0.4.4 pandas
