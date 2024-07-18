@@ -16,6 +16,8 @@ requirements:
         import argparse
         import json
 
+        print(f"Installing Packages")
+
         # Function to install packages
         def install(package):
             subprocess.check_call([sys.executable, "-m", "pip", "install", package])
@@ -28,6 +30,7 @@ requirements:
         from biolearn.data_library import GeoData
         from biolearn.mortality import calculate_mortality_hazard_ratios
 
+        print(f"Parsing Arguments")
         parser = argparse.ArgumentParser()
         parser.add_argument("-f", "--submissionfile", required=True, help="Submission File")
         parser.add_argument("-r", "--results", required=True, help="Scoring results")
@@ -35,6 +38,7 @@ requirements:
 
         args = parser.parse_args()
 
+        print(f"Calculating Score")
         try:
             # Calculate Score
             gold_standard = GeoData(pd.read_csv(args.goldstandard, index_col=0), None, None)
