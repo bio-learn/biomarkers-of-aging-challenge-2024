@@ -11,20 +11,8 @@ requirements:
     - entryname: score.py
       entry: |
         #!/usr/bin/env python
-        import subprocess
-        import sys
         import argparse
         import json
-
-        print(f"Installing Packages")
-
-        # Function to install packages
-        def install(package):
-            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-        # Install required packages
-        install("biolearn==0.4.4")
-
         from biolearn.data_library import GeoData
         from biolearn.mortality import calculate_mortality_hazard_ratios
         import pandas as pd
