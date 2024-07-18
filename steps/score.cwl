@@ -25,9 +25,9 @@ requirements:
         # Install required packages
         install("biolearn==0.4.4")
 
-        import pandas as pd
         from biolearn.data_library import GeoData
         from biolearn.mortality import calculate_mortality_hazard_ratios
+        import pandas as pd
 
         print(f"Parsing Arguments")
         parser = argparse.ArgumentParser()
