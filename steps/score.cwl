@@ -22,7 +22,7 @@ requirements:
 
         args = parser.parse_args()
 
-        result = {'hr': 1, pval: "1", 'submission_status': "SCORED"}
+        result = {'hr': 1, "pval": "1", 'submission_status': "SCORED"}
 
         # Write result
         with open(args.results, 'w') as o:
