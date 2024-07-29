@@ -13,6 +13,9 @@ requirements:
         #!/usr/bin/env python
         import argparse
         import json
+        from biolearn.data_library import GeoData
+        from biolearn.mortality import calculate_mortality_hazard_ratios
+        import pandas as pd
 
         print(f"Parsing Arguments")
         parser = argparse.ArgumentParser()
