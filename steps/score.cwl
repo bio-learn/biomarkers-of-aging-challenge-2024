@@ -34,6 +34,7 @@ requirements:
             # Extract data
             # hr_value = hazard_ratios.iloc[0]['HR']
             # pval_value = hazard_ratios.iloc[0]['P_value']
+            raise Exception("See if try works")
             result = {'hr': 1, 'pval': 1, 'submission_status': "SCORED"}
         except Exception as e:
             result = {'submission_status': "ERROR"}
