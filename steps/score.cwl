@@ -13,9 +13,6 @@ requirements:
         #!/usr/bin/env python
         import argparse
         import json
-        from biolearn.data_library import GeoData
-        from biolearn.mortality import calculate_mortality_hazard_ratios
-        import pandas as pd
 
         print(f"Parsing Arguments")
         parser = argparse.ArgumentParser()
@@ -25,8 +22,11 @@ requirements:
 
         args = parser.parse_args()
 
+        result = {'hr': 1, pval: "1", 'submission_status': "SCORED"}
+
+        # Write result
         with open(args.results, 'w') as o:
-            o.write(json.dumps({'hr': 1.5, 'pval': 1, 'submission_status': "SCORED"}))
+            o.write(json.dumps(result))
 
 inputs:
   - id: input_file
