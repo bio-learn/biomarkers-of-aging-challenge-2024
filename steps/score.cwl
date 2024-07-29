@@ -28,14 +28,13 @@ requirements:
         print(f"Calculating Score")
         try:
             # Calculate Score
-            # gold_standard = GeoData(pd.read_csv(args.goldstandard, index_col=0), None, None)
-            # submitted_predictions = pd.read_csv(args.submissionfile, index_col=0)
-            # hazard_ratios = calculate_mortality_hazard_ratios(gold_standard, submitted_predictions)
+            gold_standard = GeoData(pd.read_csv(args.goldstandard, index_col=0), None, None)
+            submitted_predictions = pd.read_csv(args.submissionfile, index_col=0)
+            hazard_ratios = calculate_mortality_hazard_ratios(gold_standard, submitted_predictions)
             # Extract data
-            # hr_value = hazard_ratios.iloc[0]['HR']
-            # pval_value = hazard_ratios.iloc[0]['P_value']
-            raise Exception("See if try works")
-            result = {'hr': 1, 'pval': 1, 'submission_status': "SCORED"}
+            hr_value = hazard_ratios.iloc[0]['HR']
+            pval_value = hazard_ratios.iloc[0]['P_value']
+            result = {'submission_status': "ERROR"}
         except Exception as e:
             result = {'submission_status': "ERROR"}
             print(f"An error occurred: {e}")
