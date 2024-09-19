@@ -32,8 +32,7 @@ requirements:
             submitted_predictions = pd.read_csv(args.submissionfile, index_col=0)
             hazard_ratios = calculate_c_index(gold_standard, submitted_predictions)
             # Extract data
-            hr_value = hazard_ratios.iloc[0]['HR']
-            pval_value = hazard_ratios.iloc[0]['P_value']
+            C_index = hazard_ratios.iloc[0]['C_index']
             result = {'c_index': C_index, 'submission_status': "SCORED"}
         except Exception as e:
             result = {'submission_status': "ERROR"}
