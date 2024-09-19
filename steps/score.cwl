@@ -14,7 +14,7 @@ requirements:
         import argparse
         import json
         from biolearn.data_library import GeoData
-        from biolearn.mortality import calculate_mortality_hazard_ratios
+        from biolearn.mortality import calculate_c_index
         import pandas as pd
 
         print(f"Parsing Arguments")
@@ -30,11 +30,11 @@ requirements:
             # Calculate Score
             gold_standard = GeoData(pd.read_csv(args.goldstandard, index_col=0), None, None)
             submitted_predictions = pd.read_csv(args.submissionfile, index_col=0)
-            hazard_ratios = calculate_mortality_hazard_ratios(gold_standard, submitted_predictions)
+            hazard_ratios = calculate_c_index(gold_standard, submitted_predictions)
             # Extract data
             hr_value = hazard_ratios.iloc[0]['HR']
             pval_value = hazard_ratios.iloc[0]['P_value']
-            result = {'hr': hr_value, 'pval': pval_value, 'submission_status': "SCORED"}
+            result = {'c_index': C_index, 'submission_status': "SCORED"}
         except Exception as e:
             result = {'submission_status': "ERROR"}
             print(f"An error occurred: {e}")
